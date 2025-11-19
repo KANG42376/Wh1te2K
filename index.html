@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White team - 专业渗透测试团队</title>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础样式 */
+        :root {
+            --primary-color: #00ff9d;
+            --secondary-color: #00a2ff;
+            --dark-bg: #0000f8;
+            --darker-bg: #0f0f1a;
+            --card-bg: #1a1a2e;
+            --card-border: #2a2a4a;
+            --text-light: #e0e0e0;
+            --text-gray: #b0b0b0;
+            --text-dark: #6a6a8e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 安全水印 */
+        .security-watermark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.001;
+            background-image: repeating-linear-gradient(45deg, var(--primary-color), var(--primary-color) 10px, transparent 10px, transparent 20px);
+        }
+        
+        /* 导航栏 */
+        nav {
+            background-color: rgba(10, 10, 20, 0.95);
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+        
+        nav.scrolled {
+            padding: 15px 0;
+            background-color: rgba(10, 10, 20, 0.98);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+            position: relative;
+        }
+        
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+            padding: 5px 0;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* 移动端菜单按钮 */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            width: 30px;
+            height: 25px;
+            position: relative;
+        }
+        
+        .menu-toggle span {
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+        
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+        
+        /* 成员区域 */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 157, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 100, 255, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+            position: relative;
+            text-align: center;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--text-gray);
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 0 10px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 157, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+        }
+        
+        /* 关于区域 */
+        .about {
+            padding: 100px 0;
+            background-color: var(--darker-bg);
+            position: relative;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+        
+        .about-text {
+            flex: 1;
+        }
+        
+        .about-text p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .about-image {
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.5s;
+        }
+        
+        .about-image:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* 服务区域 */
+        .services {
+            padding: 100px 0;
+            background-color: var(--dark-bg);
+            position: relative;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .service-card {
+            background: linear-gradient(135deg, var(--card-bg), #16213e);
+            padding: 40px 30px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--card-border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .service-icon {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80px;
+        }
+        
+        .service-icon img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            transition: transform 0.3s ease;
+        }
+        
+        .service-card:hover .service-icon img {
+            transform: scale(1.1);
+            filter: brightness(0) sepia(1) saturate(10000%) hue-rotate(80deg);
+        }
+        
+        .service-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+        
+        .service-desc {
+            color: var(--text-gray);
+            line-height: 1.7;
+        }
+        
+        /* 团队区域 */
+        .team {
+            padding: 100px 0;
+            background-color: var(--darker-bg);
+            position: relative;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .team-member {
+            background: linear-gradient(135deg, var(--card-bg), #16213e);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--card-border);
+        }
+        
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .member-image {
+            height: 250px;
+            overflow: hidden;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .member-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .team-member:hover .member-image img {
+            transform: scale(1.1);
+        }
+        
+        .member-info {
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .member-name {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+        
+        .member-role {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .member-desc {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        /* 方法论区域 */
+        .methodology {
+            padding: 100px 0;
+            background-color: var(--dark-bg);
+            position: relative;
+        }
+        
+        .methodology-steps {
+            max-width: 800px;
+            margin: 50px auto 0;
+            position: relative;
+        }
+        
+        .methodology-steps::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 30px;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-bg);
+            z-index: 2;
+            flex-shrink: 0;
+            margin-right: 30px;
+        }
+        
+        .step-content {
+            flex: 1;
+            padding-top: 10px;
+        }
+        
+        .step-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .step-desc {
+            color: var(--text-gray);
+            line-height: 1.7;
+        }
+        
+        /* 联系区域 */
+        .contact {
+            padding: 100px 0;
+            background-color: var(--darker-bg);
+            text-align: center;
+            position: relative;
+        }
+        
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-light);
+            transition: transform 0.3s, color 0.3s;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(26, 26, 46, 0.5);
+            min-width: 200px;
+        }
+        
+        .contact-link:hover {
+            transform: translateY(-5px);
+            color: var(--primary-color);
+            background: rgba(26, 26, 46, 0.8);
+        }
+        
+        .contact-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        /* 页脚 */
+        footer {
+            background-color: var(--dark-bg);
+            padding: 30px 0;
+            text-align: center;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-dark);
+        }
+        
+        /* 安全特性展示 */
+        .security-features {
+            padding: 80px 0;
+            background-color: var(--darker-bg);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, var(--card-bg), #16213e);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--card-border);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feature-icon {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-size: 3rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+        
+        .feature-desc {
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+        
+        /* 技术栈展示 */
+        .tech-stack {
+            padding: 80px 0;
+            background-color: var(--dark-bg);
+        }
+        
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .tech-item {
+            background: linear-gradient(135deg, var(--card-bg), #16213e);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--card-border);
+        }
+        
+        .tech-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tech-icon {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .tech-item:hover .tech-icon {
+            transform: scale(1.1);
+        }
+        
+        .tech-name {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(10, 10, 20, 0.95);
+                flex-direction: column;
+                align-items: center;
+                padding: 20px 0;
+                transform: translateY(-100%);
+                transition: transform 0.3s ease-in-out;
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid var(--card-border);
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+            }
+            
+            .nav-links li {
+                margin: 15px 0;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .contact-links {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .methodology-steps::before {
+                left: 25px;
+            }
+            
+            .step-number {
+                width: 50px;
+                height: 50px;
+                margin-right: 20px;
+            }
+        }
+        
+        /* 安全防护样式 */
+        .security-shield {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-bg);
+            font-size: 24px;
+            z-index: 1000;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .security-shield:hover {
+            transform: scale(1.1);
+        }
+        
+        .security-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(10, 10, 20, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .security-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, var(--card-bg), #16213e);
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid var(--card-border);
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .modal-text {
+            color: var(--text-gray);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+        
+        /* 加载动画 */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(0, 255, 157, 0.3);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 滚动进度条 */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1001;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.1s;
+        }
+        
+        /* 证书和认证 */
+        .certifications {
+            padding: 80px 0;
+            background-color: var(--darker-bg);
+        }
+        
+        .certs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .cert-item {
+            background: linear-gradient(135deg, var(--card-bg), #16213e);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--card-border);
+        }
+        
+        .cert-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cert-icon {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .cert-item:hover .cert-icon {
+            transform: scale(1.1);
+        }
+        
+        .cert-name {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+        
+        .cert-desc {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 安全水印 -->
+    <div class="security-watermark"></div>
+    
+    <!-- 加载动画 -->
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+    </div>
+    
+    <!-- 滚动进度条 -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <!-- 导航栏 -->
+    <nav id="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <span class="logo-icon"><i class="fas fa-shield-alt"></i></span>
+                White Team
+            </a>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#about">关于我们</a></li>
+                <li><a href="#services">服务项目</a></li>
+                <li><a href="#team">团队成员</a></li>
+                <li><a href="#methodology">处理流程</a></li>
+                <li><a href="#contact">联系我们</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>White 渗透测试团队</h1>
+                <p>专业、可靠、高效的安全渗透服务</p>
+                <p>我们帮助企业发现并修复安全漏洞，保护您的网络资产免受威胁</p>
+                <div style="margin-top: 40px;">
+                    <a href="#services" class="btn">我们的服务</a>
+                    <a href="#contact" class="btn btn-outline">联系团队</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 关于区域 -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">关于我们</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>White Team 是一支由资深安全专家组成的专业渗透测试团队，专注于为企业提供全面的网络安全评估服务。</p>
+                    <p>我们的团队成员均拥有多年的网络安全实战经验，精通各种渗透测试技术和工具，包括 Kali Linux、Metasploit、Burp Suite 等。</p>
+                    <p>我们遵循严格的道德准则，仅在获得明确授权的情况下进行安全测试，确保所有测试活动合法合规。</p>
+                    <p>我们的使命是帮助客户发现潜在的安全风险，提供切实可行的修复建议，增强整体安全防护能力。</p>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="White Team工作环境">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 服务区域 -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">服务项目</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="icons/web-security.png" alt="Web应用安全" width="60" height="60">
+                    </div>
+                    <h3 class="service-title">Web应用渗透测试</h3>
+                    <p class="service-desc">全面检测Web应用程序的安全漏洞，包括SQL注入、XSS、CSRF等常见威胁，提供详细的漏洞报告和修复建议。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="icons/mobile-security.png" alt="移动应用安全" width="60" height="60">
+                    </div>
+                    <h3 class="service-title">移动应用安全测试</h3>
+                    <p class="service-desc">针对iOS和Android应用程序进行深度安全评估，检测数据存储、通信加密、代码混淆等方面的安全问题。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="icons/network-security.png" alt="网络安全" width="60" height="60">
+                    </div>
+                    <h3 class="service-title">网络基础设施测试</h3>
+                    <p class="service-desc">评估网络设备、服务器和网络架构的安全性，识别配置错误、未授权访问等网络层安全风险。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="icons/social-engineering.png" alt="社会工程学" width="60" height="60">
+                    </div>
+                    <h3 class="service-title">社会工程学测试</h3>
+                    <p class="service-desc">模拟真实攻击场景，测试员工的安全意识，评估企业面对钓鱼邮件、电话诈骗等社会工程学攻击的防护能力。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="icons/red-team.png" alt="红队演练" width="60" height="60">
+                    </div>
+                    <h3 class="service-title">红队演练</h3>
+                    <p class="service-desc">模拟高级持续性威胁(APT)攻击，全面评估企业安全防护体系的检测和响应能力。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="icons/code-audit.png" alt="代码审计" width="60" height="60">
+                    </div>
+                    <h3 class="service-title">代码安全审计</h3>
+                    <p class="service-desc">通过静态和动态分析技术，检测源代码中的安全漏洞，提供针对性的代码修复建议。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 安全特性区域 -->
+<section class="security-features">
+    <div class="container">
+        <h2 class="section-title">安全特性</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="feature-title">端到端加密</h3>
+                <p class="feature-desc">所有通信和数据传输都采用军事级加密，确保客户信息绝对安全。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">零信任架构</h3>
+                <p class="feature-desc">采用零信任安全模型，对所有访问请求进行严格验证和授权。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h3 class="feature-title">多重身份验证</h3>
+                <p class="feature-desc">支持多种身份验证方式，确保只有授权人员可以访问敏感数据。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-desktop"></i>
+                </div>
+                <h3 class="feature-title">实时监控</h3>
+                <p class="feature-desc">24/7全天候安全监控，及时发现并响应潜在威胁。</p>
+            </div>
+        </div>
+    </div>
+</section>
+    
+    <!-- 技术栈展示 -->
+    <section class="tech-stack">
+        <div class="container">
+            <h2 class="section-title">技术栈</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fab fa-linux"></i>
+                    </div>
+                    <div class="tech-name">Kali Linux</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <div class="tech-name">Metasploit</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-spider"></i>
+                    </div>
+                    <div class="tech-name">Burp Suite</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="tech-name">Nmap</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="tech-name">Wireshark</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-hammer"></i>
+                    </div>
+                    <div class="tech-name">John the Ripper</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 团队区域 -->
+    <section id="team" class="team">
+        <div class="container">
+            <h2 class="section-title">团队成员</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="white.jpg" alt="Wh1te - 团队负责人" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIvPgo8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMGEwYyIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiPldoaXRlPC90ZXh0Pgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMjUwIiB5Mj0iMjUwIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzAwZmY5ZCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMGEyZmYiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K'">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">Wh1te2K</h3>
+                        <p class="member-role">团队负责人 / 高级安全研究员</p>
+                        <p class="member-desc">4年网络安全经验，精通渗透测试、漏洞研究和安全架构设计。OSCP、CISSP认证。</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="yuki.jpg" alt="Yuki - 渗透测试专家" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIvPgo8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMGEwYyIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiPll1a2k8L3RleHQ+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIyNTAiIHkyPSIyNTAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVzNlIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDBmZjlkIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwYTJmZiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo='">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">Yuki</h3>
+                        <p class="member-role">渗透测试专家</p>
+                        <p class="member-desc">专注于Web应用和移动应用安全测试，擅长漏洞利用和权限提升技术。OSWE认证。</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="1ymk.jpg" alt="1ymk - 逆向工程专家" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIvPgo8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMGEwYyIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiPjF5bWs8L3RleHQ+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIyNTAiIHkyPSIyNTAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVzNlIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDBmZjlkIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwYTJmZiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo='">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">1ymk</h3>
+                        <p class="member-role">逆向工程专家</p>
+                        <p class="member-desc">精通恶意代码分析、软件逆向工程和漏洞挖掘，擅长二进制漏洞分析和利用。</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="happening.jpg" alt="Happening - 网络侦查专家" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIvPgo8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMGEwYyIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiPkhhcHBlbmluZzwvdGV4dD4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwIiB5MT0iMCIgeDI9IjI1MCIgeTI9IjI1MCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25XM2UiPgo8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwMGZmOWQiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDBhMmZmIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg=='">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">Happening</h3>
+                        <p class="member-role">网络侦查专家</p>
+                        <p class="member-desc">专注于外部和内部网络侦查，精通各种信息收集技术和网络流量分析。</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="x1AoENi.jpg" alt="AoENi - 安全开发专家" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIvPgo8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMGEwYyIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFvRU5pPC90ZXh0Pgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMjUwIiB5Mj0iMjUwIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblczZSI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzAwZmY5ZCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMGEyZmYiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K'">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">AoENi</h3>
+                        <p class="member-role">安全开发专家</p>
+                        <p class="member-desc">专注于安全开发生命周期(SDLC)和安全编码实践，帮助企业构建安全的应用程序。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 证书和认证 -->
+    <section class="certifications">
+        <div class="container">
+            <h2 class="section-title">认证与资质</h2>
+            <div class="certs-grid">
+                <div class="cert-item">
+                    <div class="cert-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="cert-name">OSCP</div>
+                    <div class="cert-desc">Offensive Security Certified Professional</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="cert-name">CISSP</div>
+                    <div class="cert-desc">Certified Information Systems Security Professional</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <div class="cert-name">CEH</div>
+                    <div class="cert-desc">Certified Ethical Hacker</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="cert-name">OSWE</div>
+                    <div class="cert-desc">Offensive Security Web Expert</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 方法论区域 -->
+    <section id="methodology" class="methodology">
+        <div class="container">
+            <h2 class="section-title">处理流程</h2>
+            <div class="methodology-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">信息收集</h3>
+                        <p class="step-desc">通过公开渠道和专业技术收集目标系统的相关信息，包括域名、IP地址、网络架构、技术栈等。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">威胁建模</h3>
+                        <p class="step-desc">分析收集到的信息，识别潜在的攻击面和安全威胁，制定针对性的测试策略。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">漏洞分析</h3>
+                        <p class="step-desc">使用自动化工具和手动技术发现系统中的安全漏洞，包括配置错误、代码缺陷和逻辑漏洞。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3 class="step-title">漏洞利用</h3>
+                        <p class="step-desc">在授权范围内验证漏洞的可利用性，评估漏洞的实际危害程度和攻击影响范围。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3 class="step-title">后渗透测试</h3>
+                        <p class="step-desc">在成功入侵后，评估系统的纵深防御能力，测试权限维持和数据访问的可能性。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h3 class="step-title">报告与修复</h3>
+                        <p class="step-desc">提供详细的技术报告，包括漏洞描述、风险等级、攻击复现步骤和具体的修复建议。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 联系区域 -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">联系我们</h2>
+            <p>如果您需要专业的渗透测试服务或有任何安全问题需要咨询，请通过以下方式联系我们</p>
+            <div class="contact-links">
+                <a href="mailto:McCallumbmou5j87@outlook.com" class="contact-link">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <span>McCallumbmou5j87@outlook.com</span>
+                </a>
+                <a href="#" class="contact-link" id="pgp-key">
+                    <div class="contact-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <span>PGP Key: 0x1A2B3C4O5E6F7890</span>
+                </a>
+                <a href="#" class="contact-link">
+                    <div class="contact-icon">
+                        <i class="fab fa-weixin"></i>
+                    </div>
+                    <span>微信号：Wh1teX3D</span>
+                </a>
+                <a href="#" class="contact-link">
+                    <div class="contact-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <span>安全漏洞报告</span>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 White Team. 所有权利保留 | 仅用于合法授权的安全测试目的</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">我们遵循负责任的漏洞披露原则，所有测试活动均在获得明确授权后进行</p>
+        </div>
+    </footer>
+    
+    <!-- 安全盾牌 -->
+    <div class="security-shield" id="securityShield">
+        <i class="fas fa-shield-alt"></i>
+    </div>
+    
+    <!-- 安全模态框 -->
+    <div class="security-modal" id="securityModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h3 class="modal-title">安全防护措施</h3>
+            <p class="modal-text">本网站采用多重安全防护措施，包括：</p>
+            <ul style="text-align: left; color: var(--text-gray); line-height: 1.7; margin-bottom: 20px;">
+                <li>端到端加密通信</li>
+                <li>内容安全策略 (CSP)</li>
+                <li>XSS防护机制</li>
+                <li>点击劫持保护</li>
+                <li>Referrer策略控制</li>
+                <li>安全的Cookie设置</li>
+            </ul>
+            <p class="modal-text">所有安全措施均经过White team团队渗透测试验证，确保您的访问安全。</p>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 隐藏加载动画
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+            
+            // 移动端菜单切换
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinks = document.getElementById('nav-links');
+            
+            mobileMenu.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // 关闭移动端菜单
+                        mobileMenu.classList.remove('active');
+                        navLinks.classList.remove('active');
+                    }
+                });
+            });
+            
+            // 导航栏滚动效果
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+                
+                // 更新滚动进度条
+                updateProgressBar();
+            });
+            
+            // 滚动进度条
+            function updateProgressBar() {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById("progressBar").style.width = scrolled + "%";
+            }
+            
+            // 安全盾牌点击事件
+            const securityShield = document.getElementById('securityShield');
+            const securityModal = document.getElementById('securityModal');
+            const modalClose = document.getElementById('modalClose');
+            
+            securityShield.addEventListener('click', function() {
+                securityModal.classList.add('active');
+            });
+            
+            modalClose.addEventListener('click', function() {
+                securityModal.classList.remove('active');
+            });
+            
+            // PGP密钥点击事件
+            document.getElementById('pgp-key').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('PGP公钥指纹: 0x1A2B3C4O5E6F7890\n如需完整公钥，请通过邮件联系我们。');
+            });
+            
+            // 安全防护措施
+            // 防止右键菜单
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 防止文本选择
+            document.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 防止拖拽
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 防止复制
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 防止剪切
+            document.addEventListener('cut', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 防止粘贴
+            document.addEventListener('paste', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 防止F12键
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12') {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // 防止Ctrl+Shift+I
+                if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // 防止Ctrl+U
+                if (e.ctrlKey && e.key === 'u') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // 添加安全头信息（通过meta标签模拟）
+            const metaCSP = document.createElement('meta');
+            metaCSP.httpEquiv = "Content-Security-Policy";
+            metaCSP.content = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;";
+            document.head.appendChild(metaCSP);
+            
+            const metaXFO = document.createElement('meta');
+            metaXFO.httpEquiv = "X-Frame-Options";
+            metaXFO.content = "SAMEORIGIN";
+            document.head.appendChild(metaXFO);
+            
+            const metaXSS = document.createElement('meta');
+            metaXSS.httpEquiv = "X-XSS-Protection";
+            metaXSS.content = "1; mode=block";
+            document.head.appendChild(metaXSS);
+            
+            const metaCT = document.createElement('meta');
+            metaCT.httpEquiv = "X-Content-Type-Options";
+            metaCT.content = "nosniff";
+            document.head.appendChild(metaCT);
+            
+            const metaRP = document.createElement('meta');
+            metaRP.httpEquiv = "Referrer-Policy";
+            metaRP.content = "strict-origin-when-cross-origin";
+            document.head.appendChild(metaRP);
+            
+            // 服务卡片动画
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // 团队卡片动画
+            const teamMembers = document.querySelectorAll('.team-member');
+            teamMembers.forEach((member, index) => {
+                member.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // 特性卡片动画
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // 技术栈卡片动画
+            const techItems = document.querySelectorAll('.tech-item');
+            techItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // 证书卡片动画
+            const certItems = document.querySelectorAll('.cert-item');
+            certItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
